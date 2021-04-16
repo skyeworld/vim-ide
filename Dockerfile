@@ -1,7 +1,9 @@
-FROM debian:buster-slim as base
+#FROM debian:buster-slim as base
+FROM lukeskye/ubuntu as base
 
 RUN set -ex \
-  && apt-get update \
+  && apt update \
+  && apt upgrade -y \
   # install dependencies
   && apt-get install --yes --no-install-recommends \
   ca-certificates \
@@ -10,7 +12,6 @@ RUN set -ex \
   git \
   zsh \
   neovim \
-  global \
   python-setuptools \
   python3-setuptools \
   # clean cache and temporary files
@@ -62,5 +63,6 @@ RUN \
 
 # install oh-my-zsh config files
 COPY  ./config/.zshrc ./config/.p10k.zsh  /root/
+COPY  ./config/init.vim /root/.config/nvim/
 
 CMD ["zsh"]
