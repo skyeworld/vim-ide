@@ -5,6 +5,7 @@ RUN set -ex \
   # install dependencies
   && apt-get install --yes --no-install-recommends \
   ca-certificates \
+  curl \
   wget \
   git \
   zsh \
