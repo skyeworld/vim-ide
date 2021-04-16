@@ -1,4 +1,16 @@
-python-setuptools \
+FROM debian:buster-slim as base
+
+RUN set -ex \
+  && apt-get update \
+  # install dependencies
+  && apt-get install --yes --no-install-recommends \
+  ca-certificates \
+  wget \
+  git \
+  zsh \
+  neovim \
+  global \
+  python-setuptools \
   python3-setuptools \
   # clean cache and temporary files
   && apt-get clean \
