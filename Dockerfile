@@ -15,7 +15,10 @@ RUN set -ex \
   python3-setuptools \
   # clean cache and temporary files
   && apt-get clean \
-  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* *.deb
+  && rm -rf /var/lib/apt/lists/* /tmp/* /var/tmp/* *.deb \
+  &&  wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | zsh || true \
+  && sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
+           https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim' 
 
 # install Fira Code from Nerd fonts
 RUN \
@@ -40,22 +43,24 @@ RUN \
   && echo "$FIRA_CODE_RETINA_DOWNLOAD_SHA256  $FONT_DIR/Fura Code Retina Nerd Font Complete.ttf" | sha256sum -c -
 
 # install oh-my-zsh
-RUN wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | zsh || true
+#RUN wget -qO- https://raw.githubusercontent.com/ohmyzsh/ohmyzsh/master/tools/install.sh | zsh || true
 
 ARG ZSH_CUSTOM=/root/.oh-my-zsh/custom
 
 # neovim init.vim
-RUN mkdir -p ~/.config/nvim
-
-# install vim-plug
-RUN sh -c 'curl -fLo "${XDG_DATA_HOME:-$HOME/.local/share}"/nvim/site/autoload/plug.vim --create-dirs \
-           https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim'
+RUN \
+  mkdir -p /root/.config/nvim \
+  && touch /root/.z
 
 # install oh-my-zsh plugins and theme
 RUN \
   ZSH_PLUGINS=$ZSH_CUSTOM/plugins \
   && ZSH_THEMES=$ZSH_CUSTOM/themes \
   && git clone --single-branch --branch '0.7.1' --depth 1 https://github.com/zsh-users/zsh-syntax-highlighting.git $ZSH_PLUGINS/zsh-syntax-highlighting \
+  && git clone --single-branch --branch 'v0.6.4' --depth 1 https://github.com/zsh-users/zsh-autosuggestions.git $ZSH_PLUGINS/zsh-autosuggestions \
   && git clone --single-branch --depth 1 https://github.com/romkatv/powerlevel10k.git $ZSH_THEMES/powerlevel10k
+
+# install oh-my-zsh config files
+COPY  ./config/.zshrc ./config/.p10k.zsh  /root/
 
 CMD ["zsh"]
